@@ -100,12 +100,14 @@
             <div class="container">
                 <h1>See it in action</h1>
                 <h2>Click to play video</h2>
-                <div class="video-wrapper">
+                <div class="video-wrapper" id="video-wrapper">
                     <video 
                         id="demo-video"
                         controls 
                         poster="assets/video/VisualNeuroDemo_Moment.jpg"
                         preload="metadata"
+                        playsinline
+                        webkit-playsinline
                         aria-label="Visual Neuro Demo Video">
                         <source src="assets/video/VisualNeuroDemo.mp4" type="video/mp4">
                         Your browser does not support the video tag.

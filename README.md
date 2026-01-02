@@ -47,16 +47,7 @@ git clone https://github.com/yourusername/visualneuro.io.git
 cd visualneuro.io
 ```
 
-### 2. Set Up Contact Form (Formspree)
-
-1. Go to [Formspree.io](https://formspree.io) and create a free account
-2. Create a new form and copy your form ID
-3. Open `index.html` and replace `YOUR_FORM_ID` in the contact form action:
-   ```html
-   <form id="contact-form" class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-   ```
-
-### 3. Configure GitHub Pages
+### 2. Configure GitHub Pages
 
 1. Push your code to GitHub
 2. Go to your repository settings
@@ -66,13 +57,13 @@ cd visualneuro.io
 6. Click "Save"
 7. Your site will be available at `https://yourusername.github.io/visualneuro.io/`
 
-### 4. Custom Domain (Optional)
+### 3. Custom Domain (Optional)
 
-If you have a custom domain (e.g., `visualneuro.io`):
+If you have a custom domain (e.g., `visualneuro.com`):
 
 1. Add a `CNAME` file in the root directory with your domain:
    ```
-   visualneuro.io
+   visualneuro.com
    ```
 2. Configure DNS settings with your domain provider:
    - Add a CNAME record pointing to `yourusername.github.io`

@@ -13,13 +13,13 @@
     const navMenu = document.querySelector('.nav-menu');
 
     if (mobileMenuToggle && navMenu) {
-        mobileMenuToggle.addEventListener('click', function() {
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
+        const toggleMenu = function() {
+            const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+            mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
             navMenu.classList.toggle('active');
             
             // Animate hamburger icon
-            const iconBars = this.querySelectorAll('.icon-bar');
+            const iconBars = mobileMenuToggle.querySelectorAll('.icon-bar');
             if (!isExpanded) {
                 iconBars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
                 iconBars[1].style.opacity = '0';
@@ -29,19 +29,16 @@
                 iconBars[1].style.opacity = '1';
                 iconBars[2].style.transform = 'none';
             }
-        });
+        };
+
+        mobileMenuToggle.addEventListener('click', toggleMenu);
 
         // Close menu when clicking on a link
         const navLinks = navMenu.querySelectorAll('a');
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
-                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                    navMenu.classList.remove('active');
-                    const iconBars = mobileMenuToggle.querySelectorAll('.icon-bar');
-                    iconBars[0].style.transform = 'none';
-                    iconBars[1].style.opacity = '1';
-                    iconBars[2].style.transform = 'none';
+                    toggleMenu();
                 }
             });
         });
@@ -51,12 +48,7 @@
             if (window.innerWidth <= 768) {
                 const isClickInsideNav = navMenu.contains(event.target) || mobileMenuToggle.contains(event.target);
                 if (!isClickInsideNav && navMenu.classList.contains('active')) {
-                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
-                    navMenu.classList.remove('active');
-                    const iconBars = mobileMenuToggle.querySelectorAll('.icon-bar');
-                    iconBars[0].style.transform = 'none';
-                    iconBars[1].style.opacity = '1';
-                    iconBars[2].style.transform = 'none';
+                    toggleMenu();
                 }
             }
         });
@@ -71,7 +63,6 @@
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
             
-            // Skip if it's just "#"
             if (href === '#' || href === '') {
                 return;
             }
@@ -82,7 +73,6 @@
             if (targetElement) {
                 e.preventDefault();
                 
-                // Calculate offset for sticky header
                 const headerHeight = document.querySelector('.header').offsetHeight;
                 const targetPosition = targetElement.offsetTop - headerHeight;
 
@@ -91,52 +81,110 @@
                     behavior: 'smooth'
                 });
 
-                // Update URL without triggering scroll
                 history.pushState(null, null, href);
             }
         });
     });
 
     // ============================================
-    // Video Controls Enhancement
+    // Video Controls
     // ============================================
     const demoVideo = document.getElementById('demo-video');
     
     if (demoVideo) {
-        // Add play/pause on click for better UX
-        demoVideo.addEventListener('click', function() {
-            if (this.paused) {
-                this.play();
-            } else {
-                this.pause();
+        // Ensure video loads when needed
+        if (demoVideo.readyState === 0) {
+            demoVideo.load();
+        }
+        
+        // Handle video errors
+        demoVideo.addEventListener('error', function() {
+            const error = this.error;
+            let errorMessage = 'Video is currently unavailable.';
+            
+            if (error) {
+                switch(error.code) {
+                    case error.MEDIA_ERR_ABORTED:
+                        errorMessage = 'Video playback was aborted.';
+                        break;
+                    case error.MEDIA_ERR_NETWORK:
+                        errorMessage = 'Network error while loading video.';
+                        break;
+                    case error.MEDIA_ERR_DECODE:
+                        errorMessage = 'Video file is corrupted or in an unsupported format.';
+                        break;
+                    case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                        errorMessage = 'Video format is not supported or the file is missing.';
+                        break;
+                }
+            }
+            
+            const videoWrapper = demoVideo.closest('.video-wrapper');
+            if (videoWrapper) {
+                const errorMsg = document.createElement('p');
+                errorMsg.className = 'video-error';
+                errorMsg.style.cssText = 'color: #ff6b6b; margin-top: 1rem; text-align: center; padding: 1rem; background: rgba(255, 107, 107, 0.1); border-radius: 4px;';
+                errorMsg.textContent = errorMessage + ' Please check back later or contact support.';
+                videoWrapper.appendChild(errorMsg);
             }
         });
 
-        // Add keyboard controls
+        // Ensure video loads on click if needed
+        demoVideo.addEventListener('click', function() {
+            if (this.readyState === 0) {
+                this.load();
+            }
+        });
+        
+        // Remove error messages when video plays
+        demoVideo.addEventListener('play', function() {
+            const errorMsg = document.querySelector('.video-error');
+            if (errorMsg) {
+                errorMsg.remove();
+            }
+        });
+        
+        // Double-click for fullscreen
+        demoVideo.addEventListener('dblclick', function() {
+            if (this.requestFullscreen) {
+                this.requestFullscreen().catch(() => {});
+            } else if (this.webkitRequestFullscreen) {
+                this.webkitRequestFullscreen();
+            } else if (this.mozRequestFullScreen) {
+                this.mozRequestFullScreen();
+            }
+        });
+
+        // Keyboard controls
         demoVideo.addEventListener('keydown', function(e) {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 if (this.paused) {
-                    this.play();
+                    this.play().catch(() => {});
                 } else {
                     this.pause();
                 }
             }
         });
 
-        // Lazy load video on scroll into view
+        // Lazy load video when it comes into view
         const videoObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Video is in view, ensure it's ready
                     if (demoVideo.readyState === 0) {
                         demoVideo.load();
+                    }
+                } else {
+                    // Pause when out of view to save bandwidth
+                    if (!demoVideo.paused) {
+                        demoVideo.pause();
                     }
                 }
             });
         }, { rootMargin: '50px' });
 
         videoObserver.observe(demoVideo);
+        demoVideo.setAttribute('tabindex', '0');
     }
 
     // ============================================
@@ -145,17 +193,21 @@
     const contactForm = document.getElementById('contact-form');
     const formMessage = document.getElementById('form-message');
 
-    if (contactForm) {
-        // Client-side validation
+    if (contactForm && formMessage) {
+        // Email validation helper
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Form submission
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Get form fields
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
 
-            // Reset previous messages
             formMessage.className = 'form-message';
             formMessage.textContent = '';
 
@@ -190,7 +242,7 @@
             submitButton.disabled = true;
             submitButton.textContent = 'Sending...';
 
-            // Submit form (Formspree will handle this)
+            // Submit form
             const formData = new FormData(contactForm);
             
             fetch(contactForm.action, {
@@ -218,8 +270,6 @@
             .finally(() => {
                 submitButton.disabled = false;
                 submitButton.textContent = originalButtonText;
-                
-                // Scroll to message
                 formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
         });
@@ -238,29 +288,20 @@
         }
     }
 
-    // Email validation helper
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
     // ============================================
     // Header Scroll Effect
     // ============================================
     const header = document.querySelector('.header');
-    let lastScroll = 0;
-
-    window.addEventListener('scroll', function() {
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll > 100) {
-            header.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-        } else {
-            header.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-        }
-
-        lastScroll = currentScroll;
-    });
+    if (header) {
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > 100) {
+                header.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+            } else {
+                header.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            }
+        });
+    }
 
     // ============================================
     // Intersection Observer for Animations
@@ -291,8 +332,6 @@
     // ============================================
     // Accessibility Enhancements
     // ============================================
-    
-    // Skip link focus management
     const skipLink = document.querySelector('.skip-link');
     if (skipLink) {
         skipLink.addEventListener('click', function(e) {
@@ -304,17 +343,11 @@
                 targetElement.setAttribute('tabindex', '-1');
                 targetElement.focus();
                 
-                // Remove tabindex after focus to avoid tab navigation issues
                 setTimeout(() => {
                     targetElement.removeAttribute('tabindex');
                 }, 1000);
             }
         });
-    }
-
-    // Keyboard navigation for video
-    if (demoVideo) {
-        demoVideo.setAttribute('tabindex', '0');
     }
 
     // ============================================
@@ -338,11 +371,4 @@
         lazyImages.forEach(img => imageObserver.observe(img));
     }
 
-    // ============================================
-    // Console Message
-    // ============================================
-    console.log('%cVisual Neuro', 'font-size: 20px; font-weight: bold; color: #4ecdc4;');
-    console.log('%cInteractive Brain Cohort Analysis', 'font-size: 12px; color: #666;');
-
 })();
-
