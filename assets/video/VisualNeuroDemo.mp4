@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" class="errorpage">
+<head>
+  <meta charset="UTF-8">
+  <title>455 Security Incident Detected</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//splash.simply.com/errorpage.css" rel="stylesheet">
+</head>
+<body>
+  <h1>455 Security Incident Detected</h1>
+  <p>Your request was blocked.</p>
+
+  <h3>If you are the owner of the website</h3>
+  <p>The Website Application Firewall protecting your site blocked this request as suspicious.</p>
+  <p>Details can be found in your webserver logs.</p>
+
+  <hr>
+  <p>188.150.14.241</p>
+</body>
+</html>

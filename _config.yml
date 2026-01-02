@@ -1,0 +1,28 @@
+# GitHub Pages Configuration for Visual Neuro
+# This file is optional for plain HTML sites, but included for Jekyll compatibility if needed
+
+# Site settings
+title: "Visual Neuro - Interactive Brain Cohort Analysis"
+description: "Free software for visually exploring neuroimaging and clinical data."
+url: "https://visualneuro.com" # Update with your actual domain or GitHub Pages URL
+baseurl: "" # Leave empty if using custom domain, or use repository name if using github.io
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Exclude from processing
+exclude:
+  - README.md
+  - .git
+  - .gitignore
+  - node_modules
+  - package.json
+  - package-lock.json
+
+# If using Jekyll, uncomment below. For plain HTML, this file can be minimal or removed.
+# For plain HTML sites on GitHub Pages, you can delete this file or leave it as-is.
+

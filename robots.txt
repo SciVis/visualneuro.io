@@ -1,0 +1,7 @@
+# robots.txt for Visual Neuro
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://visualneuro.com/sitemap.xml
+
